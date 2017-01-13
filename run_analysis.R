@@ -1,6 +1,6 @@
 library(dplyr)
 
-setwd("C:/Work/Dropbox/WorkDir/CCG/Training/2016-Coursera-DataScience/CleaningData/Assignment")
+setwd("C:/Work/Repositories/Coursera/CleaningDataAssigment")
 
 
 
@@ -77,11 +77,11 @@ processTrial <- function (fileData,type)
     #Attribute the feature names
     colnames(features)<-featuresnames
     
-    #Get only means and STDs
-    means_Stds <- subset(features, select=c(grep("mean|std",featuresnames)))
-    
+    #RemoveDuplicated columns
+    featuresFilt <- features[, !duplicated(featuresnames, fromLast = TRUE)] 
+
     #Join with the participant ID
-    aux<-cbind(P_ID,means_Stds)
+    aux<-cbind(P_ID,featuresFilt)
     
     
     
@@ -159,8 +159,16 @@ df1 <- processTrial(FilesTest,"Test")
 df2 <- processTrial(FilesTrain,"Train")
 
 #Joins the dataframes
-final.df<-cbind(df1,df2)
+final.df<-rbind(df1,df2)
 
 #Write to file
 write.table(final.df,file = "CourseraAssignment1_CleaningData_DF.txt", row.name=FALSE,sep = ",")
 
+#Create final tables with statistics
+summ_df <- summarise(final.df)
+
+aux.df <-final.df[ , names(final.df)!="Type"]
+
+v<- aux.df %>% group_by(Activity) %>% summarise_each(funs(mean))
+
+write.table(v,file = "CourseraAssignment1_CleaningData_DF_summary.txt", row.name=FALSE,sep = ",")
