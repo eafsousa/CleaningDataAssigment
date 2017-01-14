@@ -1,6 +1,6 @@
 library(dplyr)
 
-setwd("C:/Work/Repositories/Coursera/CleaningDataAssigment")
+#setwd("C:/Work/Repositories/Coursera/CleaningDataAssigment")
 
 
 
@@ -162,13 +162,15 @@ df2 <- processTrial(FilesTrain,"Train")
 final.df<-rbind(df1,df2)
 
 #Write to file
-write.table(final.df,file = "CourseraAssignment1_CleaningData_DF.txt", row.name=FALSE,sep = ",")
+write.table(final.df,file = "CompleteDataSet.txt", row.name=FALSE,sep = ",")
 
-#Create final tables with statistics
-summ_df <- summarise(final.df)
+############ Summary tables ############
 
-aux.df <-final.df[ , names(final.df)!="Type"]
+#Discard the "type" and "ParticipantID" columns
+aux.df <-final.df[ , !names(final.df) %in%  c("Type","ParticipantID")]
 
-v<- aux.df %>% group_by(Activity) %>% summarise_each(funs(mean))
+#Group and summarizes by Activity
+summ_tb<- aux.df %>% group_by(Activity) %>% summarise_each(funs(mean))
 
-write.table(v,file = "CourseraAssignment1_CleaningData_DF_summary.txt", row.name=FALSE,sep = ",")
+#Write the table
+write.table(summ_tb,file = "CompleteDataSet_summary.txt", row.name=FALSE,sep = ",")
